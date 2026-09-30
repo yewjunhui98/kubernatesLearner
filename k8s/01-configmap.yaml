@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-api-config
+  namespace: podman-lab
+data:
+  POD_NOTE: "learning-kubernetes-with-podman"

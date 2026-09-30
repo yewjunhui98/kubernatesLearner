@@ -1,0 +1,14 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pi-once
+  namespace: podman-lab
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: pi
+          image: perl:5.34
+          command: ["perl", "-Mbignum=bpi", "-wle", "print bpi(40)"]
+  backoffLimit: 1
