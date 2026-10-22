@@ -1,0 +1,8 @@
+apiVersion: demo.cka.local/v1
+kind: Widget
+metadata:
+  name: blue-box
+  namespace: rbac-lab
+spec:
+  color: blue
+  size: 3

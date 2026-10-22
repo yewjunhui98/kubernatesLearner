@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: emptydir-demo
+  namespace: storage-lab
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["/bin/sh", "-c", "echo hi > /cache/note.txt; sleep 3600"]
+      volumeMounts:
+        - name: cache
+          mountPath: /cache
+  volumes:
+    - name: cache
+      emptyDir: {}
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: hostpath-demo
+  namespace: storage-lab
+spec:
+  containers:
+    - name: app
+      image: busybox:1.36
+      command: ["/bin/sh", "-c", "echo hostpath > /data/note.txt; sleep 3600"]
+      volumeMounts:
+        - name: host-data
+          mountPath: /data
+  volumes:
+    - name: host-data
+      hostPath:
+        path: /tmp/cka-hostpath-demo
+        type: DirectoryOrCreate

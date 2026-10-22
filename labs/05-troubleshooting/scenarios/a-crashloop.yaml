@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crashy
+  namespace: trouble-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crashy
+  template:
+    metadata:
+      labels:
+        app: crashy
+    spec:
+      containers:
+        - name: app
+          image: busybox:1.36
+          # BUG: exits immediately → CrashLoopBackOff
+          command: ["/bin/sh", "-c", "echo boom; exit 1"]

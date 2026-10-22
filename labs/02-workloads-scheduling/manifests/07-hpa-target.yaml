@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cpu-load
+  namespace: workloads-lab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cpu-load
+  template:
+    metadata:
+      labels:
+        app: cpu-load
+    spec:
+      containers:
+        - name: stress
+          image: registry.k8s.io/e2e-test-images/agnhost:2.52
+          args:
+            - "netexec"
+            - "--http-port=8080"
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: cpu-load
+  namespace: workloads-lab
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: cpu-load
+  minReplicas: 1
+  maxReplicas: 3
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 50

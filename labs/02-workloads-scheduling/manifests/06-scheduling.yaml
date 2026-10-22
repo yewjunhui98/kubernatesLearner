@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: prefer-worker
+  namespace: workloads-lab
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: podman-lab-worker
+  containers:
+    - name: pause
+      image: busybox:1.36
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      resources:
+        requests:
+          cpu: 20m
+          memory: 16Mi
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: tolerates-spot
+  namespace: workloads-lab
+spec:
+  tolerations:
+    - key: "spot"
+      operator: "Equal"
+      value: "true"
+      effect: "NoSchedule"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - podman-lab-worker2
+  containers:
+    - name: pause
+      image: busybox:1.36
+      command: ["/bin/sh", "-c", "sleep 3600"]
+      resources:
+        requests:
+          cpu: 20m
+          memory: 16Mi

@@ -1,0 +1,59 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rbac-lab
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-reader
+  namespace: rbac-lab
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: pod-reader
+  namespace: rbac-lab
+rules:
+  - apiGroups: [""]
+    resources: ["pods", "pods/log"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: read-pods
+  namespace: rbac-lab
+subjects:
+  - kind: ServiceAccount
+    name: app-reader
+    namespace: rbac-lab
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: pod-reader
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: reader-pod
+  namespace: rbac-lab
+spec:
+  serviceAccountName: app-reader
+  containers:
+    - name: kubectl
+      image: bitnami/kubectl:1.31
+      command: ["/bin/sh", "-c", "sleep 3600"]
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sample
+  namespace: rbac-lab
+  labels:
+    app: sample
+spec:
+  containers:
+    - name: pause
+      image: busybox:1.36
+      command: ["/bin/sh", "-c", "sleep 3600"]
